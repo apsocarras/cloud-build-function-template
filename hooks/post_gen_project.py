@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 from __future__ import annotations
 
+import json
 import logging
 import os
 import shutil
-
-from cookiecutter.config import get_user_config
+from types import MappingProxyType
 
 PROJECT_DIRECTORY = os.path.realpath(os.path.curdir)
 
@@ -60,11 +60,37 @@ def clean_files_and_dirs() -> None:
             move_file(license_file_name, "LICENSE")
 
 
-def print_user_inputs() -> None:
-    user_config = get_user_config()
-    print(user_config)
+def get_user_input_map() -> MappingProxyType[str, str]:
+    user_inputs: MappingProxyType[str, str] = MappingProxyType(
+        {
+            "author": "{{cookiecutter.author}}",
+            "email": "{{cookiecutter.email}}",
+            "author_github_handle": "{{cookiecutter.author_github_handle}}",
+            "github_pat": "{{cookiecutter.github_pat}}",
+            "github_cloud_build_app_installation_id": "{{cookiecutter.github_cloud_build_app_installation_id}}",
+            "project_name": "{{cookiecutter.project_name}}",
+            "project_slug": "{{cookiecutter.project_slug}}",
+            "project_description": "{{cookiecutter.project_description}}",
+            "min_python_version": "{{cookiecutter.min_python_version}}",
+            "open_source_license": "{{cookiecutter.open_source_license}}",
+            "publish_to_pypi": "{{cookiecutter.publish_to_pypi}}",
+            "include_devcontainer": "{{cookiecutter.include_devcontainer}}",
+            "include_github_actions": "{{cookiecutter.include_github_actions}}",
+            "gcp_project_id": "{{cookiecutter.gcp_project_id}}",
+            "gcp_region_id": "{{cookiecutter.gcp_region_id}}",
+            "gcp_artifact_registry_repo_name": "{{cookiecutter.gcp_artifact_registry_repo_name}}",
+            "docker_image_name": "{{cookiecutter.docker_image_name}}",
+            "gcp_log_bucket_name": "{{cookiecutter.gcp_log_bucket_name}}",
+            "gcp_trigger_name": "{{cookiecutter.gcp_trigger_name}}",
+            "trigger_branch_pattern": "{{cookiecutter.trigger_branch_pattern}}",
+            "print_user_inputs_on_build": "{{cookiecutter.print_user_inputs_on_build}}",
+        }
+    )
+    return user_inputs
 
 
 if __name__ == "__main__":
     clean_files_and_dirs()
-    print_user_inputs()
+    user_inputs = get_user_input_map()
+    if user_inputs["print_user_inputs_on_build"] == "y":
+        print(json.dumps(dict(user_inputs), indent=4))

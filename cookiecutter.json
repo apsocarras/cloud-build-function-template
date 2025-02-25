@@ -3,7 +3,7 @@
     "email": "asocarras@worldcentralkitchen.org",
     "author_github_handle": "asocarras-wck",
     "github_pat": "<INFO: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens>",
-    "github_cloud_build_app_installation_id": "<INFO: https://cloud.google.com/build/docs/automating-builds/github/connect-repo-github?authuser=2#gcloud_1>",
+    "github_cloud_build_app_installation_id": "<INFO: https://github.com/marketplace/google-cloud-build",
     "project_name": "example-cloud-build-function",
     "project_slug": "{{cookiecutter.project_name|lower|replace('-', '_')}}",
     "project_description": "This is a template you can use to create a Cloud Function in GCP with CI/CD through the managed service Google Cloud Build.",
@@ -25,5 +25,6 @@
     "docker_image_name": "{{cookiecutter.project_name}}-image", 
     "gcp_log_bucket_name": "{{cookiecutter.project_name}}-bucket",
     "gcp_trigger_name": "{{cookiecutter.project_name}}-trigger",
-    "trigger_branch_pattern":"^main$"
+    "trigger_branch_pattern":"^main$",
+    "print_user_inputs_on_build": ["y", "n"]
 }
