@@ -29,7 +29,7 @@ GITHUB_URI="https://github.com/{$GITHUB_AUTHOR}/{$PROJECT_NAME}.git"
 
 ### Verify gh auth login matches author account 
 GH_ACTIVE_ACCOUNT=$(gh auth status --active | sed -n 's/.*github.com account \([^ ]*\).*/\1/p')
-bash "$SCRIPT_DIR/check_accounts/check_github_CLI.sh" "$GITHUB_AUTHOR" "$GH_ACTIVE_ACCOUNT"
+bash "$SCRIPT_DIR/check_accounts/check_github_account_CLI.sh" "$GITHUB_AUTHOR" "$GH_ACTIVE_ACCOUNT"
 
 ### Verify core.project in gcloud CLI matches project id setting 
 ACTIVE_PROJECT_ID=$(gcloud config list --format="value(core.project)")
@@ -47,6 +47,7 @@ gcloud projects add-iam-policy-binding $GCP_PROJECT_ID \
 
 ## CONNECT GITHUB REPO TO CLOUD BUILD: https://cloud.google.com/build/docs/automating-builds/github/connect-repo-github?authuser=2#gcloud_1
 SECRET_PATH=$(bash "$SCRIPT_DIR"/gcloud_setup/setup_secret.sh $GCP_PAT_SECRET_NAME $GCP_PROJECT_ID $GITHUB_PAT "$DEFAULT_CLOUD_BUILD_SERVICE_AGENT")
+
 bash "$SCRIPT_DIR/gcloud_setup/create_github_connection.sh" "$GCP_GH_CONNECTION_NAME" "$SECRET_PATH" "$GITHUB_CLOUD_BUILD_INSTALLATION_ID" "$GCP_REGION_ID"
 bash "$SCRIPT_DIR/gcloud_setup/connect_github_via_connection.sh" "$PROJECT_NAME" "$GITHUB_URI" "$GCP_GH_CONNECTION_NAME" "$GCP_REGION_ID"
 
