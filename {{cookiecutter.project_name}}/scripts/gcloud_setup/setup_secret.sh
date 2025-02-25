@@ -8,7 +8,7 @@ SERVICE_ACCOUNT_NAME=$4
 ## Check if the secret exists; create if not 
 if gcloud secrets describe "$SECRET_NAME" --project "$PROJECT_ID" &>/dev/null; then 
     echo "Secret $SECRET_NAME exists in the project $PROJECT_ID."
-    return 
+    return 1
 else 
     echo "Secret $SECRET_NAME does not exist in the project $PROJECT_ID. Creating."
     echo -n "$SECRET_VALUE" | gcloud secrets create "$SECRET_NAME" --data-file=-=
@@ -20,4 +20,4 @@ gcloud secrets add-iam-policy-binding "$GCP_PAT_SECRET_NAME" \
     --role="roles/secretmanager.secretAccessor"
 
 
-echo "Secret Path: projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/1"
+echo "projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/1"
