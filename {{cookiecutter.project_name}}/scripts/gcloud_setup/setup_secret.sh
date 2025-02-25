@@ -6,7 +6,8 @@ SECRET_VALUE=$3
 SERVICE_ACCOUNT_NAME=$4
 
 temp_file="tmp_$SECRET_NAME.txt"
-echo "$SECRET_VALUE" >> temp_file
+echo "$SECRET_VALUE" >> "$temp_file"
+cat "$temp_file" 
 
 ## Check if the secret exists; create if not 
 if gcloud secrets describe "$SECRET_NAME" --project "$PROJECT_ID" &>/dev/null; then 

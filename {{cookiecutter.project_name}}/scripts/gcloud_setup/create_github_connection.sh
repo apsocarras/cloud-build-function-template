@@ -5,6 +5,8 @@ SECRET_PATH=$2
 GCP_GH_BUILD_INSTALL_ID=$3
 GCP_REGION_ID=$4
 
+echo "$SECRET_PATH"
+
 # Create the github connection
 gcloud builds connections create github "$CONNECTION_NAME" \
     --authorizer-token-secret-version="$SECRET_PATH" \
