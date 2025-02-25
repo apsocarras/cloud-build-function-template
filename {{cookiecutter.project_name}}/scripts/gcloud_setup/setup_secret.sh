@@ -7,7 +7,6 @@ SERVICE_ACCOUNT_NAME=$4
 
 temp_file="tmp_$SECRET_NAME.txt"
 echo "$SECRET_VALUE" >> "$temp_file"
-cat "$temp_file" 
 
 ## Check if the secret exists; create if not 
 if gcloud secrets describe "$SECRET_NAME" --project "$PROJECT_ID" &>/dev/null; then 
@@ -15,8 +14,12 @@ if gcloud secrets describe "$SECRET_NAME" --project "$PROJECT_ID" &>/dev/null; t
     # TODO Remove the existing secret and replace it with the new one
     gcloud secrets delete "$SECRET_NAME" --project "$PROJECT_ID"
     echo -n "$SECRET_VALUE" | gcloud secrets create "$SECRET_NAME" --data-file="$temp_file" --project "$PROJECT_ID"
+    
+    ## Grant access to the service account 
+    gcloud secrets add-iam-policy-binding "$GCP_PAT_SECRET_NAME" \
+        --member="serviceAccount:${SERVICE_ACCOUNT_NAME}" \
+        --role="roles/secretmanager.secretAccessor"
 
-    echo "projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/1"
 else 
     echo "Secret $SECRET_NAME does not exist in the project $PROJECT_ID. Creating."
     echo -n "$SECRET_VALUE" | gcloud secrets create "$SECRET_NAME" --data-file="$temp_file" --project "$PROJECT_ID"
@@ -25,8 +28,6 @@ else
     gcloud secrets add-iam-policy-binding "$GCP_PAT_SECRET_NAME" \
         --member="serviceAccount:${SERVICE_ACCOUNT_NAME}" \
         --role="roles/secretmanager.secretAccessor"
-
-    echo "projects/$PROJECT_ID/secrets/$SECRET_NAME/versions/1"
 fi
 
 rm "$temp_file"
