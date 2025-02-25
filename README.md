@@ -17,7 +17,7 @@ This is a template you can use to create a Cloud Function in GCP with CI/CD thro
 #### 1. Create a new project with this cookiecutter 
 
 ```bash
-uvx https://github.com/WorldCentralKitchen/cloud-build-function-template.git 
+uvx https://github.com/apsocarras/cloud-build-function-template.git 
 ```
 The above command will open a CLI interface for you to setup your own project based off this template. The CLI will prompt you for the parameters contained in `cookiecutter.json` to generate `scripts/setup.sh`.
 
