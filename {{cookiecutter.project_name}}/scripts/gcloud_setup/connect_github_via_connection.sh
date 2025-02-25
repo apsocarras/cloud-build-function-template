@@ -8,5 +8,6 @@ REGION=$4
 gcloud builds repositories create "$PROJECT_NAME" \
     --remote-uri="$GITHUB_URI" \
     --connection="$CONNECTION_NAME" \
-    --region="$REGION"
+    --region="$REGION" \
+    --quiet
 

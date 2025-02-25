@@ -18,7 +18,8 @@ if gcloud secrets describe "$SECRET_NAME" --project "$PROJECT_ID" &>/dev/null; t
     ## Grant access to the service account 
     gcloud secrets add-iam-policy-binding "$GCP_PAT_SECRET_NAME" \
         --member="serviceAccount:${SERVICE_ACCOUNT_NAME}" \
-        --role="roles/secretmanager.secretAccessor"
+        --role="roles/secretmanager.secretAccessor" \
+        --quiet
 
 else 
     echo "Secret $SECRET_NAME does not exist in the project $PROJECT_ID. Creating."
@@ -27,7 +28,8 @@ else
     ## Grant access to the service account 
     gcloud secrets add-iam-policy-binding "$GCP_PAT_SECRET_NAME" \
         --member="serviceAccount:${SERVICE_ACCOUNT_NAME}" \
-        --role="roles/secretmanager.secretAccessor"
+        --role="roles/secretmanager.secretAccessor" \
+        --quiet
 fi
 
 rm "$temp_file"

@@ -11,4 +11,5 @@ echo "$SECRET_PATH"
 gcloud builds connections create github "$CONNECTION_NAME" \
     --authorizer-token-secret-version="$SECRET_PATH" \
     --app-installation-id="$GCP_GH_BUILD_INSTALL_ID" \
-    --region="$GCP_REGION_ID"
+    --region="$GCP_REGION_ID" \
+    --quiet

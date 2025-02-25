@@ -54,7 +54,7 @@ bash "$SCRIPT_DIR"/gcloud_setup/setup_secret.sh \
     "$DEFAULT_CLOUD_BUILD_SERVICE_AGENT"
 
 SECRET_PATH="projects/$GCP_PROJECT_ID/secrets/$GCP_PAT_SECRET_NAME/versions/1"
-echo $SECRET_PATH
+echo "INFO: Created secret at $SECRET_PATH"
 bash "$SCRIPT_DIR/gcloud_setup/create_github_connection.sh" \
     "$GCP_GH_CONNECTION_NAME" \
     "$SECRET_PATH" \

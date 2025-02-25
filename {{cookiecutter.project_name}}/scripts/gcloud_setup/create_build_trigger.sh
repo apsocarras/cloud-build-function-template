@@ -14,6 +14,7 @@ gcloud builds triggers create github \
     --branch-pattern="$TRIGGER_PATTERN" \
     --build-config=cloudbuild.yaml \
     --name="$TRIGGER_NAME" \
-    --service-account="$SERVICE_ACCOUNT_EMAIL"
+    --service-account="$SERVICE_ACCOUNT_EMAIL"\
+    --quiet
     # --require-approval \
     # --include-logs-with-status \
