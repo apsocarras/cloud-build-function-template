@@ -1,0 +1,74 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# [START cloudbuild_python_yaml]
+# [START cloudbuild_python_dependencies_yaml]
+steps:
+  # Install dependencies
+  - name: python
+    entrypoint: pip
+    args: ["install", "-r", "pyproject.toml", "--user"]
+# [END cloudbuild_python_dependencies_yaml]
+
+  # [START cloudbuild_python_tests_yaml]
+  # Run unit tests
+  - name: python
+    entrypoint: python
+    args: ["-m", "pytest", "--junitxml=${SHORT_SHA}_test_log.xml"] 
+  # [END cloudbuild_python_tests_yaml]
+
+  # [START cloudbuild_python_image_yaml]
+  # Docker Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 
+           '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}', '.']
+  # [END cloudbuild_python_image_yaml]
+
+  # [START cloudbuild_python_push_yaml]
+  # Docker push to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push',  '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}']
+  # [END cloudbuild_python_push_yaml]
+  
+  # [START cloudbuild_python_deploy_yaml]
+  # Deploy to Cloud Run
+  - name: google/cloud-sdk
+    args: ['gcloud', 'run', 'deploy', '${_CLOUD_RUN_SERVICE_NAME}', 
+           '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}', 
+           '--region', '${_REGION}', '--platform', 'managed', 
+          #  '--service-account', '${_SERVICE_ACCOUNT}@${PROJECT_ID}.iam.gserviceaccount.com'
+           '--allow-unauthenticated'
+           ]
+  # [END cloudbuild_python_deploy_yaml]
+  
+# [START cloudbuild_python_logs_yaml]
+# Save test logs to Google Cloud Storage
+artifacts:
+  objects:
+    location: gs://${_BUCKET_NAME}/
+    paths:
+      - ${SHORT_SHA}_test_log.xml
+# [END cloudbuild_python_logs_yaml]
+# Store images in Google Artifact Registry 
+images:
+  - us-east1-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
+# [END cloudbuild_python_yaml]
+
+# See README.md -- had to first make an AR repo and set it here for this variable to have a valid value
+substitutions: 
+  _REGION: "{{cookiecutter.gcp_region_id}}"
+  _IMAGE_NAME: "{{cookiecutter.docker_image_name}}"
+  _CLOUD_RUN_SERVICE_NAME: "{{cookiecutter.project_name}}-${SHORT_SHA}"
+  _ARTIFACT_REGISTRY_REPO: "{{cookiecutter.gcp_artifact_registry_repo_name}}"
+  # _SERVICE_ACCOUNT: cloud-build-service-account
+  _BUCKET_NAME: "{{cookiecutter.gcp_log_bucket_name}}"

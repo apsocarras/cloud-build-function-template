@@ -1,0 +1,26 @@
+{
+    "author": "Alexander Socarras",
+    "email": "asocarras@worldcentralkitchen.org",
+    "author_github_handle": "asocarras-wck",
+    "project_name": "example-cloud-build-function",
+    "project_slug": "{{cookiecutter.project_name|lower|replace('-', '_')}}",
+    "project_description": "This is a template you can use to create a Cloud Function in GCP with CI/CD through the managed service Google Cloud Build.",
+    "min_python_version": "3.12",
+    "open_source_license": [
+        "MIT License",
+        "BSD License",
+        "ISC License",
+        "Apache Software License 2.0",
+        "GNU General Public License v3",
+        "Not open source"
+    ],
+    "publish_to_pypi":["n", "y"],
+    "include_devcontainer": ["y", "n"],
+    "include_github_actions": ["y", "n"],
+    "gcp_project_id": "wck-source",
+    "gcp_region_id": "us-east1",
+    "gcp_artifact_registry_repo_name": "{{cookiecutter.project_name}}",
+    "docker_image_name": "{{cookiecutter.project_name}}-image", 
+    "gcp_trigger_name": "{{cookiecutter.project_name}}-trigger",
+    "gcp_log_bucket_name": "{{cookiecutter.project_name}}-bucket"
+}

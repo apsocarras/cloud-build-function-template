@@ -1,7 +1,29 @@
 [project]
 name = "cloud-build-function-template"
-version = "0.1.0"
-description = "Add your description here"
+dynamic = ["version"]
+description = "This is a template you can use to create a Cloud Function in GCP with CI/CD through the managed service Google Cloud Build."
 readme = "README.md"
-requires-python = ">=3.11"
-dependencies = []
+requires-python = ">=3.12"
+dependencies = [
+    "cookiecutter>=2.6.0",
+    "jinja2>=3.1.5",
+]
+
+[build-system]
+requires = ["setuptools>=42", "setuptools_scm[toml]>=6.0.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
+[dependency-groups]
+dev = [
+    "fastapi>=0.115.8",
+    "httpx>=0.28.1",
+    "ipykernel>=6.29.5",
+    "pytest>=8.3.4",
+    "pytest-cookies>=0.7.0",
+]
+
+[tool.basedpyright]
+ignore = ['tests/', '{{cookiecutter.project_name}}/tests/test_{{cookiecutter.project_slug}}']
+reportUnnecessaryComparison = "none" # triggered by templatized strings

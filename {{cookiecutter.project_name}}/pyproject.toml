@@ -1,0 +1,27 @@
+[project]
+name = "{{cookiecutter.project_name}}"
+dynamic = ["version"]
+description = "{{cookiecutter.project_description}}"
+readme = "README.md"
+requires-python = ">={{cookiecutter.min_python_version}}"
+dependencies = [
+    "fastapi>=0.115.8",
+]
+
+[build-system]
+requires = ["setuptools>=42", "setuptools_scm[toml]>=6.0.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "pytest>=8.3.4",
+    "faker>=36.1.1",
+    "httpx>=0.28.1",
+    "ipykernel>=6.29.5",
+]
+
+[tool.basedpyright]
+ignore = ['tests/main_test']
