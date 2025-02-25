@@ -1,8 +1,23 @@
 from __future__ import annotations
 
+import logging
 import os
 import shlex
 import subprocess
+
+import logging_config
+
+logger = logging.getLogger(__name__)
+
+
+class Filter(logging.Filter):
+    def filter(self, record):
+        print(f"Logger Name: {record.name}")
+        return True
+
+
+for handler in logger.handlers:
+    handler.addFilter(Filter())
 
 from tests.utils import is_valid_yaml, run_within_dir
 
@@ -64,6 +79,15 @@ def test_not_devcontainer(cookies, tmp_path):
         assert not os.path.isfile(
             f"{result.project_path}/.devcontainer/postCreateCommand.sh"
         )
+
+
+def test_scripts_folder(cookies, tmp_path):
+    """Test that the scripts/ folder was created successfully"""
+    with run_within_dir(tmp_path):
+        result = cookies.bake()
+        assert result.exit_code == 0
+        assert os.path.isdir(script_dir := os.path.join(result.project_path, "scripts"))
+        logger.debug(os.listdir(script_dir))
 
 
 def test_license_mit(cookies, tmp_path):
@@ -150,3 +174,6 @@ def test_license_no_license(cookies, tmp_path):
         assert not os.path.isfile(f"{result.project_path}/LICENSE_ISC")
         assert not os.path.isfile(f"{result.project_path}/LICENSE_APACHE")
         assert not os.path.isfile(f"{result.project_path}/LICENSE_GPL")
+
+
+logging_config

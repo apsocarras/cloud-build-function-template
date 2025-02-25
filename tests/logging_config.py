@@ -4,6 +4,9 @@ import os
 from types import ModuleType
 
 logging.getLogger("faker").setLevel(logging.CRITICAL)
+logging.getLogger("cookiecutter").setLevel(logging.CRITICAL)
+logging.getLogger("binaryornot").setLevel(logging.CRITICAL)
+
 # Configure logging.
 # `export DEBUG=1` to see debug output.
 # `mkdir logs` to write to files too.
@@ -12,6 +15,7 @@ logging.getLogger("faker").setLevel(logging.CRITICAL)
 module_logger = logging.getLogger(__name__)
 module_logger.setLevel(logging.DEBUG)
 module_logger_str = f"({module_logger.name}: {module_logger.level})"
+
 
 main_logger = logging.getLogger(
     "__main__"
@@ -42,11 +46,9 @@ try:
         },
     )
 except ImportError:
-    # stream_formatter = logging.Formatter("%(levelname)s %(name)s %(message)s")
     stream_formatter = logging.Formatter(
         "%(levelname)s %(name)s %(module)s %(message)s %(pathname)s %(funcName)s"
     )
-
 console_handler.setFormatter(stream_formatter)
 
 package_timestamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
