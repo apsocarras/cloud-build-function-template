@@ -1,7 +1,8 @@
-_local/
+
 !_local/.gitkeep
-!{{cookiecutter.project_name}}/_local/.gitkeep
-!{{cookiecutter.project_name}}/_local/.env
+!_local/.env
+
+
 .DS_Store 
 
 # Byte-compiled / optimized / DLL files
