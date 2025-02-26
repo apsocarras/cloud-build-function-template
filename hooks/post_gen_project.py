@@ -76,6 +76,7 @@ def get_user_input_map() -> MappingProxyType[str, str]:
             "publish_to_pypi": "{{cookiecutter.publish_to_pypi}}",
             "include_devcontainer": "{{cookiecutter.include_devcontainer}}",
             "include_github_actions": "{{cookiecutter.include_github_actions}}",
+            "google_application_credentials": "{{cookiecutter.google_application_credentials}}",
             "gcp_project_id": "{{cookiecutter.gcp_project_id}}",
             "gcp_region_id": "{{cookiecutter.gcp_region_id}}",
             "gcp_artifact_registry_repo_name": "{{cookiecutter.gcp_artifact_registry_repo_name}}",

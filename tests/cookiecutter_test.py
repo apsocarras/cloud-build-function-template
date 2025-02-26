@@ -9,17 +9,17 @@ import logging_config
 
 logger = logging.getLogger(__name__)
 
-
-class Filter(logging.Filter):
-    def filter(self, record):
-        print(f"Logger Name: {record.name}")
-        return True
-
-
-for handler in logger.handlers:
-    handler.addFilter(Filter())
+from dotenv import load_dotenv
 
 from tests.utils import is_valid_yaml, run_within_dir
+
+load_dotenv()
+import pytest
+
+
+@pytest.fixture
+def gh_pat() -> str:
+    return os.environ.get("GITHUB_PAT")
 
 
 def test_bake_project(cookies):
@@ -31,26 +31,29 @@ def test_bake_project(cookies):
     assert result.project_path.is_dir()
 
 
-def test_using_pytest(cookies, tmp_path) -> None:
+def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
     with run_within_dir(tmp_path):
         result = cookies.bake(
-            extra_context={"project_name": "my-project", "publish_to_pypi": "y"}
+            extra_context={
+                "publish_to_pypi": "n",
+                "github_pat": gh_pat,
+                "project_name": "cloud-build-function-template",
+            }
         )
 
         # Assert that project was created.
         assert result.exit_code == 0
         assert result.exception is None
-        assert result.project_path.name == "my-project"
+        assert result.project_path.name == "cloud-build-function-template"
         assert result.project_path.is_dir()
-        assert is_valid_yaml(
-            result.project_path / ".github" / "workflows" / "release_pypi.yaml"
-        )
         assert is_valid_yaml(
             result.project_path / ".github" / "workflows" / "ci_test.yaml"
         )
 
         # Setup mock version number for package w/ SCM
-        os.environ["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MY_PROJECT"] = "1.0.0"
+        os.environ[
+            "SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CLOUD_BUILD_FUNCTION_TEMPLATE"
+        ] = "1.0.0"
         # Install the uv environment and run the tests.
         with run_within_dir(str(result.project_path)):
             assert subprocess.check_call(shlex.split("uv sync")) == 0

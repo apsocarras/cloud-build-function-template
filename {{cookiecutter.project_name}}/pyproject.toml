@@ -6,6 +6,13 @@ readme = "README.md"
 requires-python = ">={{cookiecutter.min_python_version}}"
 dependencies = [
     "fastapi>=0.115.8",
+    "google-api-python-client>=2.162.0",
+    "google-cloud-build>=3.31.0",
+    "google-cloud-iam>=2.18.1",
+    "google-cloud-resource-manager>=1.14.1",
+    "google-cloud-secret-manager>=2.23.1",
+    "pygithub>=2.6.1",
+    "pyyaml>=6.0.2",
 ]
 
 [build-system]
@@ -25,3 +32,4 @@ dev = [
 
 [tool.basedpyright]
 ignore = ['tests/main_test']
+reportUninitializedInstanceVariable="none"

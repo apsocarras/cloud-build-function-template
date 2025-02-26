@@ -19,6 +19,7 @@
     "publish_to_pypi":["n", "y"],
     "include_devcontainer": ["y", "n"],
     "include_github_actions": ["y", "n"],
+    "google_application_credentials": "path/to/service/account/key.json",
     "gcp_project_id": "wck-source",
     "gcp_region_id": "us-east1",
     "gcp_artifact_registry_repo_name": "{{cookiecutter.project_name}}",
