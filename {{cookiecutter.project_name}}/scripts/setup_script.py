@@ -1,6 +1,6 @@
-from {{cookiecutter.project_slug}}.cloud_infra_setup.config import Config 
-from {{cookiecutter.project_slug}}.cloud_infra_setup import gcp 
-from {{cookiecutter.project_slug}}.cloud_infra_setup import github
+from {{cookiecutter.project_slug}}.cloud_infra.config import Config 
+from {{cookiecutter.project_slug}}.cloud_infra import gcp 
+from {{cookiecutter.project_slug}}.cloud_infra import github
 
 from google.cloud import resourcemanager_v3
 from google.cloud.resourcemanager_v3.services.projects.client import ProjectsClient
@@ -13,19 +13,7 @@ logger.setLevel(logging.DEBUG)
 
 def main() -> None:
 
-    config = Config(
-        PROJECT_NAME="{{cookiecutter.project_name}}",  # gh repo name
-        GITHUB_PAT="{{cookiecutter.github_pat}}",
-        GITHUB_AUTHOR="{{cookiecutter.author_github_handle}}",
-        GITHUB_CLOUD_BUILD_INSTALLATION_ID="{{cookiecutter.github_cloud_build_app_installation_id}}",
-        GCP_PROJECT_ID="{{cookiecutter.gcp_project_id}}",  # name of organizing project in GCP
-        GOOGLE_APPLICATION_CREDENTIALS="{{cookiecutter.google_application_credentials}}",
-        GCP_REGION_ID="{{cookiecutter.gcp_region_id}}",
-        GCP_ARTIFACT_REGISTRY_REPO="{{cookiecutter.gcp_artifact_registry_repo_name}}",
-        GCP_TRIGGER_NAME="{{cookiecutter.gcp_trigger_name}}",
-        GCP_TRIGGER_PATTERN="{{cookiecutter.trigger_branch_pattern}}"
-        run_validation=False
-    )
+    config = Config(run_validation=False)
 
     logger.debug("Assigning permissions to default cloud build service account")
     _ = gcp.assign_permissions_to_default_cloud_builder_service_account(
@@ -37,7 +25,6 @@ def main() -> None:
         secret_name=config.gcp_pat_secret_name,
         project_id=config.GCP_PROJECT_ID,
         secret_value=config.GITHUB_PAT,
-        service_account_email=config.cloud_build_service_agent_email,
     )
 
     logger.debug("Assigning the secret to the cloud builder service account")

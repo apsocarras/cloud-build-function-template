@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from google.cloud import resourcemanager_v3
 from google.cloud.resourcemanager_v3.services.projects.client import ProjectsClient
 
+from .cookiecutter_inputs import USER_INPUTS
 from .gcp import (
     make_secret_path,
 )
@@ -18,16 +19,18 @@ logger.setLevel(logging.DEBUG)
 
 @dataclass
 class Config:
-    PROJECT_NAME: str  # gh repo name
-    GITHUB_PAT: str
-    GITHUB_AUTHOR: str
-    GITHUB_CLOUD_BUILD_INSTALLATION_ID: str
-    GCP_PROJECT_ID: str
-    GOOGLE_APPLICATION_CREDENTIALS: str
-    GCP_REGION_ID: str
-    GCP_ARTIFACT_REGISTRY_REPO: str
-    GCP_TRIGGER_NAME: str
-    GCP_TRIGGER_PATTERN: str
+    PROJECT_NAME: str = USER_INPUTS["PROJECT_NAME"]  # gh repo name =
+    GITHUB_PAT: str = USER_INPUTS["GITHUB_PAT"]
+    GITHUB_AUTHOR: str = USER_INPUTS["GITHUB_AUTHOR"]
+    GITHUB_CLOUD_BUILD_INSTALLATION_ID: str = USER_INPUTS[
+        "GITHUB_CLOUD_BUILD_INSTALLATION_ID"
+    ]
+    GCP_PROJECT_ID: str = USER_INPUTS["GCP_PROJECT_ID"]
+    GOOGLE_APPLICATION_CREDENTIALS: str = USER_INPUTS["GOOGLE_APPLICATION_CREDENTIALS"]
+    GCP_REGION_ID: str = USER_INPUTS["GCP_REGION_ID"]
+    GCP_ARTIFACT_REGISTRY_REPO: str = USER_INPUTS["GCP_ARTIFACT_REGISTRY_REPO"]
+    GCP_TRIGGER_NAME: str = USER_INPUTS["GCP_TRIGGER_NAME"]
+    GCP_TRIGGER_PATTERN: str = USER_INPUTS["GCP_TRIGGER_PATTERN"]
 
     run_validation: bool = True
 

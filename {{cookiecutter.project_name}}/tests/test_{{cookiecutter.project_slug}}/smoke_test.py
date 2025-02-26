@@ -3,7 +3,7 @@ Put basic tests here to ensure that your package builds correctly and maintains 
 """
 
 from {{cookiecutter.project_slug}} import hello_author
-from {{cookiecutter.project_slug}}.setup_cloud_function import Config
+from {{cookiecutter.project_slug}}.cloud_infra.config import Config
 import pytest 
 
 def test_hello_author() ->  None: 

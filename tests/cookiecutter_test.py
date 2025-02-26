@@ -7,6 +7,7 @@ import subprocess
 from typing import LiteralString
 
 import logging_config
+import pytest
 
 logger = logging.getLogger(__name__)
 
@@ -15,12 +16,18 @@ from dotenv import load_dotenv
 from tests.utils import is_valid_yaml, run_within_dir
 
 load_dotenv()
-import pytest
+assert os.environ.get("GITHUB_PAT", None)
+assert os.environ.get("GITHUB_CLOUD_BUILD_INSTALLATION_ID", None)
 
 
 @pytest.fixture
 def gh_pat() -> str:
     return os.environ.get("GITHUB_PAT")
+
+
+@pytest.fixture
+def github_cloud_build_app_installation_id() -> str:
+    return os.environ.get("GITHUB_CLOUD_BUILD_INSTALLATION_ID")
 
 
 def test_bake_project(cookies):
@@ -32,18 +39,18 @@ def test_bake_project(cookies):
     assert result.project_path.is_dir()
 
 
-def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
-    TEST_PROJECT_NAME = "my-project"
-    TEST_PROJECT_TEST_FOLDER: LiteralString = "test_my_project"
+def test_using_pytest(
+    cookies, tmp_path, gh_pat, github_cloud_build_app_installation_id
+) -> None:
+    TEST_PROJECT_NAME = "example-cloud-build-function"
+    TEST_PROJECT_SLUG = TEST_PROJECT_NAME.replace("-", "_")
+    TEST_PROJECT_TEST_FOLDER: LiteralString = f"test_{TEST_PROJECT_SLUG}"
 
-    def make_test_folder_path(f: str) -> str:
-        return os.path.join(TEST_PROJECT_TEST_FOLDER, f)
+    def make_test_folder_path(*args: str) -> str:
+        return os.path.join(TEST_PROJECT_TEST_FOLDER, *args)
 
-    gcp_functions_test_file = make_test_folder_path("gcp_functions_test.py")
+    gcp_functions_test_file = make_test_folder_path("cloud_infra", "gcp_test.py")
     main_test_file = make_test_folder_path("main_test.py")
-    setup_cloud_function_test_file = make_test_folder_path(
-        "setup_cloud_function_test.py"
-    )
     smoke_test_file = make_test_folder_path("smoke_test.py")
 
     def make_test_command(
@@ -57,6 +64,9 @@ def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
                 "publish_to_pypi": "n",
                 "github_pat": gh_pat,
                 "project_name": TEST_PROJECT_NAME,
+                "github_cloud_build_app_installation_id": os.environ.get(
+                    "GITHUB_CLOUD_BUILD_INSTALLATION_ID"
+                ),
             }
         )
 
@@ -71,7 +81,9 @@ def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
 
         # Setup mock version number for package w/ SCM
         # Install the uv environment and run the tests.
-        os.environ["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MY_PROJECT"] = "1.0.0"
+        os.environ[
+            f"SETUPTOOLS_SCM_PRETEND_VERSION_FOR_{TEST_PROJECT_SLUG.upper()}"
+        ] = "1.0.0"
         with run_within_dir(str(result.project_path)):
             ## Setup git
             # assert subprocess.check_call(shlex.split("git init")) == 0
