@@ -37,25 +37,28 @@ def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
             extra_context={
                 "publish_to_pypi": "n",
                 "github_pat": gh_pat,
-                "project_name": "cloud-build-function-template",
+                "project_name": "my-project",
             }
         )
 
         # Assert that project was created.
         assert result.exit_code == 0
         assert result.exception is None
-        assert result.project_path.name == "cloud-build-function-template"
+        assert result.project_path.name == "my-project"
         assert result.project_path.is_dir()
         assert is_valid_yaml(
             result.project_path / ".github" / "workflows" / "ci_test.yaml"
         )
 
         # Setup mock version number for package w/ SCM
-        os.environ[
-            "SETUPTOOLS_SCM_PRETEND_VERSION_FOR_CLOUD_BUILD_FUNCTION_TEMPLATE"
-        ] = "1.0.0"
         # Install the uv environment and run the tests.
         with run_within_dir(str(result.project_path)):
+            assert subprocess.check_call(shlex.split("git init")) == 0
+            assert subprocess.check_call(shlex.split("git add .")) == 0
+            assert (
+                subprocess.check_call(shlex.split('git commit -m "Initial commit"'))
+                == 0
+            )
             assert subprocess.check_call(shlex.split("uv sync")) == 0
             assert subprocess.check_call(shlex.split("uv run pytest tests/")) == 0
 
