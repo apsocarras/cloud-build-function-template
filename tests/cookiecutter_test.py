@@ -52,13 +52,14 @@ def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
 
         # Setup mock version number for package w/ SCM
         # Install the uv environment and run the tests.
+        os.environ["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MY_PROJECT"] = "1.0.0"
         with run_within_dir(str(result.project_path)):
-            assert subprocess.check_call(shlex.split("git init")) == 0
-            assert subprocess.check_call(shlex.split("git add .")) == 0
-            assert (
-                subprocess.check_call(shlex.split('git commit -m "Initial commit"'))
-                == 0
-            )
+            # assert subprocess.check_call(shlex.split("git init")) == 0
+            # assert subprocess.check_call(shlex.split("git add .")) == 0
+            # assert (
+            #     subprocess.check_call(shlex.split('git commit -m "Initial commit"'))
+            #     == 0
+            # )
             assert subprocess.check_call(shlex.split("uv sync")) == 0
             assert subprocess.check_call(shlex.split("uv run pytest tests/")) == 0
 
