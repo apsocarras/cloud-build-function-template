@@ -26,7 +26,7 @@ def run_subprocess_w_check(cmds: list[str]) -> CompletedProcess[str]:
         raise RuntimeError(
             f"Command failed with return code {result.returncode}: {result.stderr}"
         )
-
+    logger.info(result)
     return result
 
 
