@@ -1,10 +1,11 @@
-import setuptools_scm
 from setuptools import find_packages, setup
 
-setup(
+_ = setup(
     name="{{cookiecutter.project_name}}",
-    version=setuptools_scm.get_version(),
-    packages=find_packages(),
     use_scm_version=True,
-    setup_requires=["setuptools>=42", "setuptools_scm"],
+    package_dir={"": "src"},
+    packages=find_packages(where="src", exclude={"test*", "testing*", "tests*"}),
+    # cmdclass={"build_py": my_build_py},  # noqa: F821
+    # include_package_data=True,
+    # package_data={PACKAGE_DIR_NAME: ["*.zip", ".gz"]},
 )
