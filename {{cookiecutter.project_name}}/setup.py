@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 _ = setup(
-    name="{{cookiecutter.project_name}}",
+    name="{{cookiecutter.project_slug}}",
     use_scm_version=True,
     package_dir={"": "src"},
     packages=find_packages(where="src", exclude={"test*", "testing*", "tests*"}),
