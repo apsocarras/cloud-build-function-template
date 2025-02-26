@@ -15,3 +15,11 @@ default_config,
         gcp_project_id=default_config.GCP_PROJECT_ID, 
         gcp_project_number=default_config.gcp_project_number,
     )
+
+def test_create_secret(default_config): 
+    {
+        secret_name:default_config.gcp_pat_secret_name,
+        project_id:default_config.GCP_PROJECT_ID,
+        secret_value:default_config.GITHUB_PAT,
+        service_account_email: default_config.cloud_build_service_agent_email,
+    }

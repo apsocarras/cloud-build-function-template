@@ -13,6 +13,7 @@ dependencies = [
     "google-cloud-secret-manager>=2.23.1",
     "pygithub>=2.6.1",
     "pyyaml>=6.0.2",
+    "setuptools>=75.8.1",
 ]
 
 [build-system]
