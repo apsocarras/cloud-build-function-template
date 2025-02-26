@@ -18,13 +18,26 @@ logger = logging.getLogger(__name__)
 SecretPath: TypeAlias = str
 
 
+def run_subprocess_w_check(cmds: list[str]) -> CompletedProcess[str]:
+    result: CompletedProcess[str] = subprocess.run(
+        cmds, check=True, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Command failed with return code {result.returncode}: {result.stderr}"
+        )
+
+    return result
+
+
 def assign_permissions_to_default_cloud_builder_service_account(
     gcp_project_id: str,
     gcp_project_number: str,
-) -> None:
+) -> CompletedProcess[str]:
     default_cloud_build_service_account = (
         f"service-{gcp_project_number}@gcp-sa-cloudbuild.iam.gserviceaccount.com"
     )
+
     cmds = [
         "gcloud",
         "projects",
@@ -33,13 +46,9 @@ def assign_permissions_to_default_cloud_builder_service_account(
         f"--member=serviceAccount:{default_cloud_build_service_account}",
         "--role=roles/cloudbuild.builds.builder",
     ]
-    result: CompletedProcess[str] = subprocess.run(
-        cmds, check=True, capture_output=True, text=True
-    )
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"Command failed with return code {result.returncode}: {result.stderr}"
-        )
+
+    result = run_subprocess_w_check(cmds)
+    return result
 
 
 def make_secret_path(secret_name: str, project_id: str) -> SecretPath:
@@ -86,7 +95,7 @@ def create_secret(
         else:
             raise
 
-    _ = client.create_secret(secret_id=secret_name, parent=parent, secret=secret)
+    # _ = client.create_secret(secret_id=secret_name, parent=parent, secret=secret)
 
     # add secret version w/ new value
     payload = secret_value.encode("UTF-8")
@@ -100,7 +109,7 @@ def create_secret(
 
 def assign_secret_to_service_account(
     service_account_email: str, secret_path: SecretPath
-) -> None:
+) -> CompletedProcess[str]:
     """TODO: not sure how to do this with the google cloud sdk"""
     cmds = [
         "gcloud",
@@ -110,13 +119,7 @@ def assign_secret_to_service_account(
         f"--member='serviceAccount:{service_account_email}'",
         "--role='roles/secretmanager.secretAccessor'",
     ]
-    result: CompletedProcess[str] = subprocess.run(
-        cmds, check=True, capture_output=True, text=True
-    )
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"Command failed with return code {result.returncode}: {result.stderr}"
-        )
+    return run_subprocess_w_check(cmds)
 
 
 def create_github_cloud_build_connection(
@@ -124,7 +127,7 @@ def create_github_cloud_build_connection(
     secret_path: SecretPath,
     cloud_build_install_id: str,  # github.com/settings/installations/
     region_id: str,
-) -> None:
+) -> CompletedProcess[str]:
     cmds = [
         "gcloud",
         "builds",
@@ -136,8 +139,7 @@ def create_github_cloud_build_connection(
         f"--app-installation-id='{cloud_build_install_id}'",
         f"--region={region_id}",
     ]
-    subprocess.call(cmds)
-    return
+    return run_subprocess_w_check(cmds)
 
 
 def connect_github_via_connection(
@@ -145,7 +147,7 @@ def connect_github_via_connection(
     github_uri: str,
     connection_name: str,
     region_id: str,
-) -> None:
+) -> CompletedProcess[str]:
     cmds = [
         "gcloud",
         "builds",
@@ -156,8 +158,7 @@ def connect_github_via_connection(
         f"--connection='{connection_name}'",
         f"--region='{region_id}'",
     ]
-    subprocess.call(cmds)
-    return
+    return run_subprocess_w_check(cmds)
 
 
 def create_artifact_registry_repository(
@@ -165,7 +166,7 @@ def create_artifact_registry_repository(
     artifact_registry_repo_name: str,
     region_id: str,
     description: str | None = None,
-) -> None:
+) -> CompletedProcess[str]:
     description = (
         description
         or f"Repository for images related to the {project_name} cloud build project"
@@ -181,7 +182,7 @@ def create_artifact_registry_repository(
         f"--description='{description}'",
     ]
 
-    subprocess.call(cmds)
+    return run_subprocess_w_check(cmds)
 
 
 def create_build_trigger(
@@ -191,7 +192,7 @@ def create_build_trigger(
     trigger_pattern: str,
     trigger_name: str,
     service_account_email: str,
-) -> None:
+) -> CompletedProcess[str]:
     cmds = [
         "gcloud",
         "builds",
@@ -208,4 +209,4 @@ def create_build_trigger(
         # --require-approval,
         # --include-logs-with-status,
     ]
-    subprocess.call(cmds)
+    return run_subprocess_w_check(cmds)

@@ -180,7 +180,7 @@ wheels = [
 
 [[package]]
 name = "cloud-build-function-template"
-version = "0.1.dev23+g2d8b817.d20250226"
+version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "cookiecutter" },
