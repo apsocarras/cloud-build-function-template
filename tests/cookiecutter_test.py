@@ -4,6 +4,7 @@ import logging
 import os
 import shlex
 import subprocess
+from typing import LiteralString
 
 import logging_config
 
@@ -32,19 +33,37 @@ def test_bake_project(cookies):
 
 
 def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
+    TEST_PROJECT_NAME = "my-project"
+    TEST_PROJECT_TEST_FOLDER: LiteralString = "test_my_project"
+
+    def make_test_folder_path(f: str) -> str:
+        return os.path.join(TEST_PROJECT_TEST_FOLDER, f)
+
+    gcp_functions_test_file = make_test_folder_path("gcp_functions_test.py")
+    main_test_file = make_test_folder_path("main_test.py")
+    setup_cloud_function_test_file = make_test_folder_path(
+        "setup_cloud_function_test.py"
+    )
+    smoke_test_file = make_test_folder_path("smoke_test.py")
+
+    def make_test_command(
+        test_file_name: str, other_args: str | None = None
+    ) -> list[str]:
+        return shlex.split(f"uv run pytest tests/{test_file_name}" + (other_args or ""))
+
     with run_within_dir(tmp_path):
         result = cookies.bake(
             extra_context={
                 "publish_to_pypi": "n",
                 "github_pat": gh_pat,
-                "project_name": "my-project",
+                "project_name": TEST_PROJECT_NAME,
             }
         )
 
         # Assert that project was created.
         assert result.exit_code == 0
         assert result.exception is None
-        assert result.project_path.name == "my-project"
+        assert result.project_path.name == TEST_PROJECT_NAME
         assert result.project_path.is_dir()
         assert is_valid_yaml(
             result.project_path / ".github" / "workflows" / "ci_test.yaml"
@@ -54,14 +73,28 @@ def test_using_pytest(cookies, tmp_path, gh_pat) -> None:
         # Install the uv environment and run the tests.
         os.environ["SETUPTOOLS_SCM_PRETEND_VERSION_FOR_MY_PROJECT"] = "1.0.0"
         with run_within_dir(str(result.project_path)):
+            ## Setup git
             # assert subprocess.check_call(shlex.split("git init")) == 0
             # assert subprocess.check_call(shlex.split("git add .")) == 0
             # assert (
             #     subprocess.check_call(shlex.split('git commit -m "Initial commit"'))
             #     == 0
             # )
+            # Setup package env
             assert subprocess.check_call(shlex.split("uv sync")) == 0
-            assert subprocess.check_call(shlex.split("uv run pytest tests/")) == 0
+            # Run tests individually
+            assert (
+                subprocess.check_call(make_test_command(gcp_functions_test_file)) == 0
+            )
+            assert subprocess.check_call(make_test_command(main_test_file)) == 0
+            assert (
+                subprocess.check_call(
+                    make_test_command(
+                        smoke_test_file,
+                    )
+                )
+                == 0
+            )
 
 
 def test_devcontainer(cookies, tmp_path):

@@ -38,6 +38,8 @@ class Config:
     GCP_TRIGGER_NAME: str = "{{cookiecutter.gcp_trigger_name}}"
     GCP_TRIGGER_PATTERN: str = "{{cookiecutter.trigger_branch_pattern}}"
 
+    run_validation: bool = True
+
     @property
     def gcp_project_number(self) -> str:
         projects_client: ProjectsClient = resourcemanager_v3.ProjectsClient()
@@ -72,8 +74,11 @@ class Config:
 
     ## Validation steps
     def __post_init__(self) -> None:
-        check_github_pat(self.GITHUB_AUTHOR, self.GITHUB_PAT)
-        _ = check_github_repo(self.GITHUB_AUTHOR, self.PROJECT_NAME, self.GITHUB_PAT)
+        if self.run_validation:
+            check_github_pat(self.GITHUB_AUTHOR, self.GITHUB_PAT)
+            _ = check_github_repo(
+                self.GITHUB_AUTHOR, self.PROJECT_NAME, self.GITHUB_PAT
+            )
 
 
 if __name__ == "__main__":

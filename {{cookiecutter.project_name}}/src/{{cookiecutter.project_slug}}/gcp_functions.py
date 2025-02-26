@@ -4,9 +4,13 @@ from ast import TypeAlias
 from subprocess import CompletedProcess
 from typing import TypeAlias
 
-from google.cloud import secretmanager
+from google.cloud import secretmanager, secretmanager_v1
 from google.cloud.secretmanager_v1.services.secret_manager_service.client import (
     SecretManagerServiceClient,
+)
+from google.cloud.secretmanager_v1.types.service import (
+    DeleteSecretRequest,
+    GetSecretRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,17 +55,27 @@ def create_secret(
     service_account_email: str,
     overwrite: bool = True,
 ) -> SecretPath:
+    """https://codelabs.developers.google.com/codelabs/secret-manager-python?authuser=2#5"""
     client: SecretManagerServiceClient = secretmanager.SecretManagerServiceClient()
 
     parent = f"projects/{project_id}"
     secret_path = make_secret_path(secret_name=secret_name, project_id=project_id)
+    secret = {"replication": {"automatic": {}}}
 
     try:
-        _ = client.get_secret(name=secret_path)
+        get_request: GetSecretRequest = secretmanager_v1.GetSecretRequest(
+            name=secret_path,
+        )
+        _ = client.get_secret(request=get_request)
         logger.info(f"Secret {secret_name} already exists in project {project_id}")
         if overwrite:
             logger.info("Overwriting secret with new value.")
-            client.delete_secret(name=secret_path)
+
+            del_request: DeleteSecretRequest = secretmanager_v1.DeleteSecretRequest(
+                name=secret_path
+            )
+
+            client.delete_secret(request=del_request)
 
     except Exception as e:
         if "NotFound" in str(e) or "not found" in str(e):
@@ -72,15 +86,14 @@ def create_secret(
         else:
             raise
 
-    secret = client.create_secret(
-        parent=parent,
-        secret_id=secret_name,
-    )
+    _ = client.create_secret(secret_id=secret_name, parent=parent, secret=secret)
 
-    _ = client.add_secret_version(
-        parent=secret.name,
-        payload={"data": secret_value.encode()},  # pyright: ignore[reportArgumentType]
+    # add secret version w/ new value
+    payload = secret_value.encode("UTF-8")
+    request = secretmanager.AddSecretVersionRequest(
+        parent=secret_path, payload={"data": payload}
     )
+    _ = client.add_secret_version(request=request)
 
     return secret_path
 
