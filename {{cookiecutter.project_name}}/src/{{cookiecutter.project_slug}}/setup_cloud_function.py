@@ -81,10 +81,10 @@ class Config:
             )
 
 
-if __name__ == "__main__":
+def main() -> None:
     config = Config()
 
-    assign_permissions_to_default_cloud_builder_service_account(
+    _ = assign_permissions_to_default_cloud_builder_service_account(
         config.GCP_PROJECT_ID, config.gcp_project_number
     )
     gh_pat_secret_path = create_secret(
@@ -94,33 +94,33 @@ if __name__ == "__main__":
         service_account_email=config.cloud_build_service_agent_email,
     )
 
-    assign_secret_to_service_account(
+    _ = assign_secret_to_service_account(
         service_account_email=config.cloud_build_service_agent_email,
         secret_path=gh_pat_secret_path,
     )
 
-    create_github_cloud_build_connection(
+    _ = create_github_cloud_build_connection(
         connection_name=config.gcp_github_connection_name,
         secret_path=config.gcp_pat_secret_path,
         cloud_build_install_id=config.GITHUB_CLOUD_BUILD_INSTALLATION_ID,
         region_id=config.GCP_REGION_ID,
     )
 
-    connect_github_via_connection(
+    _ = connect_github_via_connection(
         project_name=config.PROJECT_NAME,
         github_uri=config.github_uri,
         connection_name=config.gcp_github_connection_name,
         region_id=config.GCP_REGION_ID,
     )
 
-    create_artifact_registry_repository(
+    _ = create_artifact_registry_repository(
         project_name=config.PROJECT_NAME,
         artifact_registry_repo_name=config.GCP_ARTIFACT_REGISTRY_REPO,
         region_id=config.GCP_REGION_ID,
         description=None,
     )
 
-    create_build_trigger(
+    _ = create_build_trigger(
         region_id=config.GCP_REGION_ID,
         project_name=config.PROJECT_NAME,
         author=config.GITHUB_AUTHOR,
@@ -128,3 +128,7 @@ if __name__ == "__main__":
         trigger_pattern=config.GCP_TRIGGER_PATTERN,
         service_account_email=config.cloud_build_service_agent_email,
     )
+
+
+if __name__ == "__main__":
+    main()
