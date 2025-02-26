@@ -1,4 +1,84 @@
-from {{cookiecutter.project_slug}}.setup_cloud_function import main 
+from {{cookiecutter.project_slug}}.cloud_infra_setup.config import Config 
+from {{cookiecutter.project_slug}}.cloud_infra_setup import gcp 
+from {{cookiecutter.project_slug}}.cloud_infra_setup import github
+
+from google.cloud import resourcemanager_v3
+from google.cloud.resourcemanager_v3.services.projects.client import ProjectsClient
+
+
+import logging 
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+def main() -> None:
+
+    config = Config(
+        PROJECT_NAME="{{cookiecutter.project_name}}",  # gh repo name
+        GITHUB_PAT="{{cookiecutter.github_pat}}",
+        GITHUB_AUTHOR="{{cookiecutter.author_github_handle}}",
+        GITHUB_CLOUD_BUILD_INSTALLATION_ID="{{cookiecutter.github_cloud_build_app_installation_id}}",
+        GCP_PROJECT_ID="{{cookiecutter.gcp_project_id}}",  # name of organizing project in GCP
+        GOOGLE_APPLICATION_CREDENTIALS="{{cookiecutter.google_application_credentials}}",
+        GCP_REGION_ID="{{cookiecutter.gcp_region_id}}",
+        GCP_ARTIFACT_REGISTRY_REPO="{{cookiecutter.gcp_artifact_registry_repo_name}}",
+        GCP_TRIGGER_NAME="{{cookiecutter.gcp_trigger_name}}",
+        GCP_TRIGGER_PATTERN="{{cookiecutter.trigger_branch_pattern}}"
+        run_validation=False
+    )
+
+    logger.debug("Assigning permissions to default cloud build service account")
+    _ = gcp.assign_permissions_to_default_cloud_builder_service_account(
+        config.GCP_PROJECT_ID, config.gcp_project_number
+    )
+
+    logger.debug("Creating secret in google cloud for gh pat")
+    gh_pat_secret_path = gcp.create_secret(
+        secret_name=config.gcp_pat_secret_name,
+        project_id=config.GCP_PROJECT_ID,
+        secret_value=config.GITHUB_PAT,
+        service_account_email=config.cloud_build_service_agent_email,
+    )
+
+    logger.debug("Assigning the secret to the cloud builder service account")
+    _ = gcp.assign_secret_to_service_account(
+        service_account_email=config.cloud_build_service_agent_email,
+        secret_path=gh_pat_secret_path,
+    )
+
+    logger.debug("Creating the cloud build to github connection")
+    _ = gcp.create_github_cloud_build_connection(
+        connection_name=config.gcp_github_connection_name,
+        secret_path=config.gcp_pat_secret_path,
+        cloud_build_install_id=config.GITHUB_CLOUD_BUILD_INSTALLATION_ID,
+        region_id=config.GCP_REGION_ID,
+    )
+
+    logger.debug("Connecting Cloud Build to GitHub via the connection")
+    _ = gcp.connect_github_via_connection(
+        project_name=config.PROJECT_NAME,
+        github_uri=config.github_uri,
+        connection_name=config.gcp_github_connection_name,
+        region_id=config.GCP_REGION_ID,
+    )
+
+    logger.debug("Creating Artifact Registry Repository")
+    _ = gcp.create_artifact_registry_repository(
+        project_name=config.PROJECT_NAME,
+        artifact_registry_repo_name=config.GCP_ARTIFACT_REGISTRY_REPO,
+        region_id=config.GCP_REGION_ID,
+        description=None,
+    )
+
+    logger.debug("Creating Cloud Build Trigger")
+    _ = gcp.create_build_trigger(
+        region_id=config.GCP_REGION_ID,
+        project_name=config.PROJECT_NAME,
+        author=config.GITHUB_AUTHOR,
+        trigger_name=config.GCP_TRIGGER_NAME,
+        trigger_pattern=config.GCP_TRIGGER_PATTERN,
+        service_account_email=config.cloud_build_service_agent_email,
+    )
 
 
 if __name__ == "__main__": 
