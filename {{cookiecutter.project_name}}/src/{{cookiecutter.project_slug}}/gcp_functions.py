@@ -95,7 +95,7 @@ def create_secret(
         else:
             raise
 
-    # _ = client.create_secret(secret_id=secret_name, parent=parent, secret=secret)
+    _ = client.create_secret(secret_id=secret_name, parent=parent, secret=secret)
 
     # add secret version w/ new value
     payload = secret_value.encode("UTF-8")
