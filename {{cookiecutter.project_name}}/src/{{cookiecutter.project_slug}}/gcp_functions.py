@@ -1,6 +1,7 @@
 import logging
 import subprocess
 from ast import TypeAlias
+from subprocess import CompletedProcess
 from typing import TypeAlias
 
 from google.cloud import secretmanager
@@ -28,7 +29,9 @@ def assign_permissions_to_default_cloud_builder_service_account(
         f"--member=serviceAccount:{default_cloud_build_service_account}",
         "--role=roles/cloudbuild.builds.builder",
     ]
-    result = subprocess.run(cmds, check=True, capture_output=True, text=True)
+    result: CompletedProcess[str] = subprocess.run(
+        cmds, check=True, capture_output=True, text=True
+    )
     if result.returncode != 0:
         raise RuntimeError(
             f"Command failed with return code {result.returncode}: {result.stderr}"
@@ -50,6 +53,7 @@ def create_secret(
 ) -> SecretPath:
     client: SecretManagerServiceClient = secretmanager.SecretManagerServiceClient()
 
+    parent = f"projects/{project_id}"
     secret_path = make_secret_path(secret_name=secret_name, project_id=project_id)
 
     try:
@@ -60,9 +64,9 @@ def create_secret(
             client.delete_secret(name=secret_path)
 
     except Exception as e:
-        if "NotFound" in str(e):
+        if "NotFound" in str(e) or "not found" in str(e):
             logger.info(
-                f"Secrete {secret_name} not found in prolect {project_id}. Creating."
+                f"Secret {secret_name} not found in project {project_id}. Creating."
             )
             pass
         else:
@@ -90,11 +94,16 @@ def assign_secret_to_service_account(
         "secrets",
         "add-iam-policy-binding",
         secret_path,
-        f"--member='serviceAccount:${service_account_email}'",
+        f"--member='serviceAccount:{service_account_email}'",
         "--role='roles/secretmanager.secretAccessor'",
     ]
-    subprocess.call(cmds)
-    return None
+    result: CompletedProcess[str] = subprocess.run(
+        cmds, check=True, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Command failed with return code {result.returncode}: {result.stderr}"
+        )
 
 
 def create_github_cloud_build_connection(
