@@ -69,6 +69,6 @@ substitutions:
   _REGION: "{{cookiecutter.gcp_region_id}}"
   _IMAGE_NAME: "{{cookiecutter.docker_image_name}}"
   _CLOUD_RUN_SERVICE_NAME: "{{cookiecutter.project_name}}-${SHORT_SHA}"
-  _ARTIFACT_REGISTRY_REPO: "{{cookiecutter.gcp_artifact_registry_repo_name}}"
+  _ARTIFACT_REGISTRY_REPO: "{{cookiecutter.gcp_artifact_registry_repo}}"
   # _SERVICE_ACCOUNT: cloud-build-service-account
   _BUCKET_NAME: "{{cookiecutter.gcp_log_bucket_name}}"

@@ -4,44 +4,40 @@ import logging
 import os
 import shlex
 import subprocess
+from pathlib import Path
 from typing import LiteralString
 
 import logging_config
 import pytest
-from dotenv import dotenv_values
+from dotenv import dotenv_values, load_dotenv
 
 from tests.utils import is_valid_yaml, run_within_dir
 
 logger = logging.getLogger(__name__)
+TEST_FILE = Path(__file__)
+TEST_DIR = TEST_FILE.parent
+ENV_PATH = TEST_DIR / ".env"
+assert ENV_PATH.is_file()
 
 
 @pytest.fixture
 def user_inputs() -> dict[str, str | None]:
-    return dotenv_values(".env")
+    return dotenv_values(ENV_PATH)
 
 
-@pytest.fixture
-def gh_pat(user_inputs: dict[str, str | None]) -> str:
-    return user_inputs.get("GITHUB_PAT")
+def test_bake_project(cookies, tmp_path):
+    with run_within_dir(tmp_path):
+        result = cookies.bake(extra_context={"project_name": "my-project"})
+
+        assert result.exit_code == 0
+        assert result.exception is None
+        assert result.project_path.name == "my-project"
+        assert result.project_path.is_dir()
 
 
-@pytest.fixture
-def github_cloud_build_app_installation_id(user_inputs: dict[str, str | None]) -> str:
-    return user_inputs.get("GITHUB_CLOUD_BUILD_INSTALLATION_ID")
+def test_using_pytest(cookies, tmp_path, user_inputs) -> None:
+    load_dotenv(ENV_PATH)
 
-
-def test_bake_project(cookies):
-    result = cookies.bake(extra_context={"project_name": "my-project"})
-
-    assert result.exit_code == 0
-    assert result.exception is None
-    assert result.project_path.name == "my-project"
-    assert result.project_path.is_dir()
-
-
-def test_using_pytest(
-    cookies, tmp_path, gh_pat, github_cloud_build_app_installation_id
-) -> None:
     TEST_PROJECT_NAME = "example-cloud-build-function"
     TEST_PROJECT_SLUG = TEST_PROJECT_NAME.replace("-", "_")
     TEST_PROJECT_TEST_FOLDER: LiteralString = f"test_{TEST_PROJECT_SLUG}"
@@ -62,9 +58,11 @@ def test_using_pytest(
         result = cookies.bake(
             extra_context={
                 "publish_to_pypi": "n",
-                "github_pat": gh_pat,
+                "github_pat": user_inputs["GITHUB_PAT"],
                 "project_name": TEST_PROJECT_NAME,
-                "github_cloud_build_app_installation_id": github_cloud_build_app_installation_id,
+                "github_cloud_build_app_installation_id": user_inputs[
+                    "GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID"
+                ],
             }
         )
 

@@ -14,13 +14,13 @@ def test_config() -> None:
         'PROJECT_NAME':'dummy-project', 
         'GITHUB_AUTHOR': 'dummy-author',
         'GITHUB_PAT': 'dummy-pat',
-        'GITHUB_CLOUD_BUILD_INSTALLATION_ID': 'dummy-id',
-        'GCP_PROJECT_ID': 'dummy-project-id',
+        'GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID': 'dummy-id',
+        'GCP_PROJECT_ID': 'wck-source',
         'GOOGLE_APPLICATION_CREDENTIALS': 'dummy-app-creds',
         'GCP_REGION_ID': 'dummy-region-id',
         'GCP_ARTIFACT_REGISTRY_REPO': 'dummy-art-registry',
         'GCP_TRIGGER_NAME': 'dummy-trigger',
-        'GCP_TRIGGER_PATTERN': 'dummy-trigger-pattern',
+        'TRIGGER_BRANCH_PATTERN': 'dummy-trigger-pattern',
     }
 
     config = Config(**dummy_inputs, run_validation=False) 

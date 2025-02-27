@@ -102,7 +102,6 @@ def create_secret(
             pass
         else:
             raise
-
     _ = client.create_secret(secret_id=secret_name, parent=parent, secret=secret)  # pyright: ignore[reportArgumentType]
 
     # add secret version w/ new value

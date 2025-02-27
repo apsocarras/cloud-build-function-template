@@ -7,13 +7,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_NAME="{{cookiecutter.project_name}}" # gh repo name
 GITHUB_PAT="{{cookiecutter.github_pat}}"
 GITHUB_AUTHOR="{{cookiecutter.github_author}}"
-GITHUB_CLOUD_BUILD_INSTALLATION_ID="{{cookiecutter.github_cloud_build_app_installation_id}}"
+GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID="{{cookiecutter.github_cloud_build_app_installation_id}}"
 GCP_PROJECT_ID="{{cookiecutter.gcp_project_id}}" # name of organizing project in GCP
 GCP_REGION_ID="{{cookiecutter.gcp_region_id}}"
-GCP_ARTIFACT_REGISTRY_REPO="{{cookiecutter.gcp_artifact_registry_repo_name}}"
+GCP_ARTIFACT_REGISTRY_REPO="{{cookiecutter.gcp_artifact_registry_repo}}"
 # DOCKER_IMAGE_NAME="{{cookiecutter.docker_image_name}}"
 GCP_TRIGGER_NAME="{{cookiecutter.gcp_trigger_name}}"
-GCP_TRIGGER_PATTERN="{{cookiecutter.trigger_branch_pattern}}"
+TRIGGER_BRANCH_PATTERN="{{cookiecutter.trigger_branch_pattern}}"
 # GCP_LOG_BUCKET_NAME="{{cookiecutter.gcp_log_bucket_name}}"
 
 # Derived variables 
@@ -58,7 +58,7 @@ echo "INFO: Created secret at $SECRET_PATH"
 bash "$SCRIPT_DIR/gcloud_setup/create_github_connection.sh" \
     "$GCP_GH_CONNECTION_NAME" \
     "$SECRET_PATH" \
-    "$GITHUB_CLOUD_BUILD_INSTALLATION_ID" \
+    "$GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID" \
     "$GCP_REGION_ID"\
 
 bash "$SCRIPT_DIR/gcloud_setup/connect_github_via_connection.sh" \
@@ -71,4 +71,4 @@ bash "$SCRIPT_DIR/gcloud_setup/connect_github_via_connection.sh" \
 bash "$SCRIPT_DIR/gcloud_setup/create_artifact_registry_repo.sh" $GCP_ARTIFACT_REGISTRY_REPO $GCP_REGION_ID $PROJECT_NAME 
 
 ## CREATE BUILD TRIGGER 
-bash "$SCRIPT_DIR/gcloud_setup/create_build_trigger.sh" "$GCP_REGION_ID" "$PROJECT_NAME" "$GITHUB_AUTHOR" "$GCP_TRIGGER_PATTERN" "$GCP_TRIGGER_NAME" "$DEFAULT_CLOUD_BUILD_SERVICE_AGENT"
+bash "$SCRIPT_DIR/gcloud_setup/create_build_trigger.sh" "$GCP_REGION_ID" "$PROJECT_NAME" "$GITHUB_AUTHOR" "$TRIGGER_BRANCH_PATTERN" "$GCP_TRIGGER_NAME" "$DEFAULT_CLOUD_BUILD_SERVICE_AGENT"

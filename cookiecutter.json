@@ -22,7 +22,7 @@
     "google_application_credentials": "path/to/service/account/key.json",
     "gcp_project_id": "wck-source",
     "gcp_region_id": "us-east1",
-    "gcp_artifact_registry_repo_name": "{{cookiecutter.project_name}}",
+    "gcp_artifact_registry_repo": "{{cookiecutter.project_name}}",
     "docker_image_name": "{{cookiecutter.project_name}}-image", 
     "gcp_log_bucket_name": "{{cookiecutter.project_name}}-bucket",
     "gcp_trigger_name": "{{cookiecutter.project_name}}-trigger",

@@ -1,3 +1,4 @@
+from pathlib import Path
 from {{cookiecutter.project_slug}}.cloud_infra.config import Config 
 from {{cookiecutter.project_slug}}.cloud_infra import gcp 
 from {{cookiecutter.project_slug}}.cloud_infra import github
@@ -11,9 +12,13 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+CUR_FILE = Path(__file__)
+PROJECT_DIRECTORY = CUR_FILE.parents[1]
+ENV_FILE_PATH = PROJECT_DIRECTORY / "_local" / ".env"
+
 def main() -> None:
 
-    config = Config(run_validation=False)
+    config = Config.from_env(ENV_FILE_PATH, run_validation=False)
 
     logger.debug("Assigning permissions to default cloud build service account")
     _ = gcp.assign_permissions_to_default_cloud_builder_service_account(
@@ -37,7 +42,7 @@ def main() -> None:
     _ = gcp.create_github_cloud_build_connection(
         connection_name=config.gcp_github_connection_name,
         secret_path=config.gcp_pat_secret_path,
-        cloud_build_install_id=config.GITHUB_CLOUD_BUILD_INSTALLATION_ID,
+        cloud_build_install_id=config.GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID,
         region_id=config.GCP_REGION_ID,
     )
 
@@ -63,7 +68,7 @@ def main() -> None:
         project_name=config.PROJECT_NAME,
         author=config.GITHUB_AUTHOR,
         trigger_name=config.GCP_TRIGGER_NAME,
-        trigger_pattern=config.GCP_TRIGGER_PATTERN,
+        trigger_pattern=config.TRIGGER_BRANCH_PATTERN,
         service_account_email=config.cloud_build_service_agent_email,
     )
 

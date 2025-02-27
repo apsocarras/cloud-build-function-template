@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from {{cookiecutter.project_slug}}.cloud_infra.config import Config
 from {{cookiecutter.project_slug}}.cloud_infra.gcp import (
     assign_permissions_to_default_cloud_builder_service_account,
@@ -21,10 +23,17 @@ from tests.utils import run_within_dir
 import pytest 
 
 logger = logging.getLogger(__name__)
+PROJ_ROOT=Path(__file__).parents[3]
+
+@pytest.fixture 
+def env_path() -> Path:
+    locals_dir = PROJ_ROOT / '_local'
+    assert locals_dir.is_dir(), os.listdir(PROJ_ROOT)
+    return locals_dir / ".env"
 
 @pytest.fixture
-def default_config() -> Config:
-    config= Config(run_validation=False)
+def default_config(env_path) -> Config:
+    config= Config.from_env(env_path,run_validation=False)
     return config
 
 def test_assign_permissions_to_default_cloud_builder_service_account(default_config) -> None:
@@ -52,7 +61,7 @@ def test_create_github_cloud_build_connection(default_config) -> None:
     kwargs = {
         "connection_name":default_config.gcp_github_connection_name,
         "secret_path":default_config.gcp_pat_secret_path,
-        "cloud_build_install_id":default_config.GITHUB_CLOUD_BUILD_INSTALLATION_ID,
+        "cloud_build_install_id":default_config.GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID,
         "region_id":default_config.GCP_REGION_ID,
     }
     create_github_cloud_build_connection(**kwargs)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import re
 import sys
@@ -30,24 +29,3 @@ def validate_project_names() -> None:
 
 if __name__ == "__main__":
     validate_project_names()
-
-
-def make_env_file() -> None:
-    """Generate .env file in baked package files based on cookiecutter.json"""
-
-    with open(COOKIECUTTER_JSON_INPUTS, mode="r") as file:
-        input_data: dict[str, str] = json.load(file)
-
-    with open(ENV_PATH, "w") as file:
-        for k in input_data.keys():
-            line_str = (
-                k.upper().strip()
-                + " = "
-                + "{%raw%}{{{%endraw%}"
-                + "cookiecutter."
-                + k.strip()
-                + "{%raw%}}}{%endraw%}"
-            )
-            logger.debug(line_str)
-            _ = file.write(line_str)
-            _ = file.write("\n")

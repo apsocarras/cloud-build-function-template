@@ -1,10 +1,11 @@
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
+from pathlib import Path
 
+from dotenv import dotenv_values
 from google.cloud import resourcemanager_v3
 from google.cloud.resourcemanager_v3.services.projects.client import ProjectsClient
 
-from .cookiecutter_inputs import USER_INPUTS
 from .gcp import (
     make_secret_path,
 )
@@ -19,20 +20,35 @@ logger.setLevel(logging.DEBUG)
 
 @dataclass
 class Config:
-    PROJECT_NAME: str = USER_INPUTS["PROJECT_NAME"]  # gh repo name =
-    GITHUB_PAT: str = USER_INPUTS["GITHUB_PAT"]
-    GITHUB_AUTHOR: str = USER_INPUTS["GITHUB_AUTHOR"]
-    GITHUB_CLOUD_BUILD_INSTALLATION_ID: str = USER_INPUTS[
-        "GITHUB_CLOUD_BUILD_INSTALLATION_ID"
-    ]
-    GCP_PROJECT_ID: str = USER_INPUTS["GCP_PROJECT_ID"]
-    GOOGLE_APPLICATION_CREDENTIALS: str = USER_INPUTS["GOOGLE_APPLICATION_CREDENTIALS"]
-    GCP_REGION_ID: str = USER_INPUTS["GCP_REGION_ID"]
-    GCP_ARTIFACT_REGISTRY_REPO: str = USER_INPUTS["GCP_ARTIFACT_REGISTRY_REPO"]
-    GCP_TRIGGER_NAME: str = USER_INPUTS["GCP_TRIGGER_NAME"]
-    GCP_TRIGGER_PATTERN: str = USER_INPUTS["GCP_TRIGGER_PATTERN"]
-
+    GITHUB_PAT: str
+    GITHUB_CLOUD_BUILD_APP_INSTALLATION_ID: str
+    GCP_PROJECT_ID: str
+    GOOGLE_APPLICATION_CREDENTIALS: str
+    GCP_REGION_ID: str
+    GCP_ARTIFACT_REGISTRY_REPO: str
+    GCP_TRIGGER_NAME: str
+    TRIGGER_BRANCH_PATTERN: str
+    PROJECT_NAME: str
+    GITHUB_AUTHOR: str
     run_validation: bool = True
+
+    @classmethod
+    def from_env(
+        cls,
+        env_path: str | Path,
+        run_validation: bool = True,
+        **kwargs: dict[str, str | bool],
+    ) -> "Config":
+        field_names = set(f.name for f in fields(cls))
+        env_values = {
+            k: v for k, v in dotenv_values(env_path).items() if k in field_names
+        }
+        inputs: dict[str, str | bool] = {
+            **env_values,
+            **{"run_validation": run_validation},
+            **kwargs,
+        }  # pyright: ignore[reportAssignmentType]
+        return cls(**inputs)  # pyright: ignore[reportArgumentType]
 
     @property
     def gcp_project_number(self) -> str:
@@ -73,3 +89,14 @@ class Config:
             _ = check_github_repo(
                 self.GITHUB_AUTHOR, self.PROJECT_NAME, self.GITHUB_PAT
             )
+
+
+from dataclasses import dataclass
+
+
+@dataclass
+class Toy:
+    foo: str = "bar"
+
+
+set(f.name for f in fields(Toy))
