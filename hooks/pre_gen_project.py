@@ -2,18 +2,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 import sys
-from pathlib import Path
 
 logger = logging.getLogger(__name__)
-
-PROJECT_DIRECTORY = Path(os.path.realpath(os.path.curdir))
-COOKIECUTTER_JSON_INPUTS = PROJECT_DIRECTORY / "cookiecutter.json"
-BAKED_DIR = PROJECT_DIRECTORY / "{{cookiecutter.project_name}}"
-ENV_OUT_DIR = BAKED_DIR / "_local"
-ENV_PATH = ENV_OUT_DIR / ".env"
 
 
 def validate_project_names() -> None:
@@ -36,19 +28,8 @@ def validate_project_names() -> None:
         sys.exit(1)
 
 
-def validate_file_paths() -> None:
-    if not COOKIECUTTER_JSON_INPUTS.is_file():
-        logger.error(
-            f"ERROR: cookiecutter.json not found in project directory {os.listdir(PROJECT_DIRECTORY)}"
-        )
-        sys.exit(1)
-
-    if not BAKED_DIR.is_dir():
-        logger.error(
-            "ERROR: {{cookiecutter.project_name}}"
-            + f" not found in project directory {os.listdir(PROJECT_DIRECTORY)}"
-        )
-        sys.exit(1)
+if __name__ == "__main__":
+    validate_project_names()
 
 
 def make_env_file() -> None:
@@ -59,12 +40,14 @@ def make_env_file() -> None:
 
     with open(ENV_PATH, "w") as file:
         for k in input_data.keys():
-            line_str = k.upper().strip() + " = " + "{{cookiecutter." + k + "}}"
+            line_str = (
+                k.upper().strip()
+                + " = "
+                + "{%raw%}{{{%endraw%}"
+                + "cookiecutter."
+                + k.strip()
+                + "{%raw%}}}{%endraw%}"
+            )
+            logger.debug(line_str)
             _ = file.write(line_str)
             _ = file.write("\n")
-
-
-if __name__ == "__main__":
-    validate_project_names()
-    validate_file_paths()
-    make_env_file()

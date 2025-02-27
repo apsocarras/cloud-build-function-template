@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 from __future__ import annotations
 
-import json
 import logging
 import os
 import shutil
-
-from dotenv import dotenv_values
-
-from .pre_gen_project import ENV_PATH
 
 PROJECT_DIRECTORY = os.path.realpath(os.path.curdir)
 
@@ -64,12 +59,5 @@ def clean_files_and_dirs() -> None:
             move_file(license_file_name, "LICENSE")
 
 
-def get_user_input_map() -> dict[str, str | None]:
-    return dotenv_values(ENV_PATH)
-
-
 if __name__ == "__main__":
     clean_files_and_dirs()
-    user_inputs = get_user_input_map()
-    if user_inputs["print_user_inputs_on_build"] == "y":
-        print(json.dumps(dict(user_inputs), indent=4))

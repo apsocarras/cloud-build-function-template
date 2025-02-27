@@ -5,6 +5,7 @@ description = "This is a template you can use to create a Cloud Function in GCP 
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "click>=8.1.8",
     "cookiecutter>=2.6.0",
     "google-api-python-client>=2.162.0",
     "google-cloud-build>=3.31.0",
