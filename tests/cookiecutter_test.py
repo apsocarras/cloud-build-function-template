@@ -8,26 +8,26 @@ from typing import LiteralString
 
 import logging_config
 import pytest
-
-logger = logging.getLogger(__name__)
-
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
 from tests.utils import is_valid_yaml, run_within_dir
 
-load_dotenv()
-assert os.environ.get("GITHUB_PAT", None)
-assert os.environ.get("GITHUB_CLOUD_BUILD_INSTALLATION_ID", None)
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def gh_pat() -> str:
-    return os.environ.get("GITHUB_PAT")
+def user_inputs() -> dict[str, str | None]:
+    return dotenv_values(".env")
 
 
 @pytest.fixture
-def github_cloud_build_app_installation_id() -> str:
-    return os.environ.get("GITHUB_CLOUD_BUILD_INSTALLATION_ID")
+def gh_pat(user_inputs: dict[str, str | None]) -> str:
+    return user_inputs.get("GITHUB_PAT")
+
+
+@pytest.fixture
+def github_cloud_build_app_installation_id(user_inputs: dict[str, str | None]) -> str:
+    return user_inputs.get("GITHUB_CLOUD_BUILD_INSTALLATION_ID")
 
 
 def test_bake_project(cookies):
@@ -64,9 +64,7 @@ def test_using_pytest(
                 "publish_to_pypi": "n",
                 "github_pat": gh_pat,
                 "project_name": TEST_PROJECT_NAME,
-                "github_cloud_build_app_installation_id": os.environ.get(
-                    "GITHUB_CLOUD_BUILD_INSTALLATION_ID"
-                ),
+                "github_cloud_build_app_installation_id": github_cloud_build_app_installation_id,
             }
         )
 
