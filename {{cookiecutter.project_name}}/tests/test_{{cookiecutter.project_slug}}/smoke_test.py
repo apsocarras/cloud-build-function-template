@@ -10,7 +10,20 @@ def test_hello_author() ->  None:
     hello_author()
 
 def test_config() -> None:
-    config = Config(run_validation=False) 
+    dummy_inputs = {
+        'PROJECT_NAME':'dummy-project', 
+        'GITHUB_AUTHOR': 'dummy-author',
+        'GITHUB_PAT': 'dummy-pat',
+        'GITHUB_CLOUD_BUILD_INSTALLATION_ID': 'dummy-id',
+        'GCP_PROJECT_ID': 'dummy-project-id',
+        'GOOGLE_APPLICATION_CREDENTIALS': 'dummy-app-creds',
+        'GCP_REGION_ID': 'dummy-region-id',
+        'GCP_ARTIFACT_REGISTRY_REPO': 'dummy-art-registry',
+        'GCP_TRIGGER_NAME': 'dummy-trigger',
+        'GCP_TRIGGER_PATTERN': 'dummy-trigger-pattern',
+    }
+
+    config = Config(**dummy_inputs, run_validation=False) 
     config.gcp_project_number
     config.cloud_build_service_agent_email
     config.gcp_github_connection_name
