@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Added by cookiecutter initialization
 PROJECT_NAME="{{cookiecutter.project_name}}" # gh repo name
 GITHUB_PAT="{{cookiecutter.github_pat}}"
-GITHUB_AUTHOR="{{cookiecutter.author_github_handle}}"
+GITHUB_AUTHOR="{{cookiecutter.github_author}}"
 GITHUB_CLOUD_BUILD_INSTALLATION_ID="{{cookiecutter.github_cloud_build_app_installation_id}}"
 GCP_PROJECT_ID="{{cookiecutter.gcp_project_id}}" # name of organizing project in GCP
 GCP_REGION_ID="{{cookiecutter.gcp_region_id}}"
@@ -35,7 +35,7 @@ bash "$SCRIPT_DIR/check_accounts/check_github_account_CLI.sh" "$GITHUB_AUTHOR" "
 ACTIVE_PROJECT_ID=$(gcloud config list --format="value(core.project)")
 bash "$SCRIPT_DIR/check_accounts/check_gcloud_CLI.sh" "$GCP_PROJECT_ID" "$ACTIVE_PROJECT_ID"
 
-### Verify github repository exists: {{cookiecutter.author_github_handle}}/{{cookiecutter.project_name}}
+### Verify github repository exists: {{cookiecutter.github_author}}/{{cookiecutter.project_name}}
 bash "$SCRIPT_DIR/check_accounts/check_github_repo_CLI.sh" $GITHUB_AUTHOR $PROJECT_NAME $GITHUB_PAT
 
 #### -------------------- ####
