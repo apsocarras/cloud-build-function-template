@@ -6,6 +6,8 @@ This is a CookieCutter template you can use to create a Cloud Function in GCP wi
 
 *[Cloud Build](https://cloud.google.com/build/docs)* is managed CI/CD service on GCP and serves as an alternative deployment method to GitHub Actions, which can also publish to Cloud Functions. Cloud Build can be incorporated into CI/CD workflows with other checks via GitHub Actions (as is demo'd in this template).  
 
+*[Terraform](https://www.terraform.io/)* is a declarative infrastructure-as-code tool I *should* have utilized rather than struggle with the inconsistently-documented GCP SDKs.
+
 Before attempting to use the template, first ensure that you have the prerequisites checked off (see ***Prerequisites***).
 
 ### 1. Create a new local project
