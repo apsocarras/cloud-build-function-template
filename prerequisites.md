@@ -50,7 +50,7 @@ Be prepared to provide the PAT, the path to your .json, and the github repo url 
 
 - [ ] Create and download a .json key for the service account. Store the .json in a secure folder on your machine (see **Securing Keys**)
  ![alt text](static/assets/image-1.png)
-
+ 
     Cloud Console > Service Accounts > `cloud-build-service-account` > Manage 
     Keys > Add Key > JSON
 
